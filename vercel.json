@@ -3,6 +3,7 @@
   "outputDirectory": "frontend/dist",
   "installCommand": "npm install",
   "regions": ["iad1"],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- backend/",
   "functions": {
     "api/**/*.ts": {
       "runtime": "@vercel/node@3.0.0",

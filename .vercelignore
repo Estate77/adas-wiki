@@ -1,0 +1,11 @@
+backend/
+node_modules/
+.git/
+.vercel/
+*.log
+.env
+.env.local
+.env.production
+deploy.ps1
+setup-vercel-env.ps1
+启动智驾.bat
