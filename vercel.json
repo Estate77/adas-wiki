@@ -6,7 +6,7 @@
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- backend/",
   "functions": {
     "api/**/*.ts": {
-      "runtime": "@vercel/node@3.0.0",
+      "runtime": "@vercel/node@4.0.0",
       "memory": 1024,
       "maxDuration": 10
     }
