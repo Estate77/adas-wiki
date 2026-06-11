@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0F172A" />
+    <meta name="description" content="智驾百科 ADAS-Wiki · 用最简单的方式，看懂最硬核的智能驾驶" />
+    <title>智驾百科 · ADAS-Wiki</title>
+    <script>
+      // SPA fallback: GitHub Pages serves 404.html for unknown routes.
+      // Convert /adas-wiki/<path> back to the index route and let react-router handle it.
+      (function () {
+        var base = '/adas-wiki';
+        var path = window.location.pathname;
+        if (path.indexOf(base) === 0) {
+          var rest = path.slice(base.length);
+          if (rest && rest !== '/' && rest.indexOf('.') === -1) {
+            window.history.replaceState({}, '', base + '/' + rest.replace(/^\/+/, ''));
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body class="bg-ink-950 text-ink-50 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

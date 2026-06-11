@@ -62,6 +62,7 @@ backend/src/generated/
 
 # ===================== 本地启动脚本 =====================
 启动智驾.bat
+ADAS/
 
 .vercel
 .env*
