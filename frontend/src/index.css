@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== 全局基础 ===== */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply font-sans text-ink-50 bg-ink-950;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 自定义滚动条 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-ink-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neon-500;
+  }
+
+  /* 选中文本 */
+  ::selection {
+    @apply bg-neon-400/30 text-white;
+  }
+
+  /* 链接默认 */
+  a {
+    @apply outline-none;
+  }
+  a:focus-visible {
+    @apply ring-2 ring-neon-400 rounded;
+  }
+}
+
+/* ===== 组件层 ===== */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full
+           bg-neon-400 text-ink-900 font-medium tracking-wide
+           transition-all duration-300 ease-out
+           hover:bg-neon-300 hover:shadow-glow-md
+           active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full
+           border border-ink-600 text-ink-100 font-medium
+           transition-all duration-300
+           hover:border-neon-400 hover:text-neon-300;
+  }
+
+  .glass-panel {
+    @apply bg-ink-900/60 backdrop-blur-xl border border-ink-800/80 rounded-2xl;
+  }
+
+  .text-gradient {
+    background: linear-gradient(120deg, #38BDF8 0%, #818CF8 50%, #38BDF8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* ===== 工具层 ===== */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  /* 渐变边框 */
+  .border-gradient {
+    position: relative;
+    isolation: isolate;
+  }
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.6), rgba(129, 140, 248, 0.2));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* ===== Markdown 渲染样式（仅作用于 .markdown-body 内部） ===== */
+.markdown-body {
+  @apply text-ink-100 text-sm leading-relaxed-pro;
+}
+
+.markdown-body > * + * { @apply mt-3; }
+
+.md-h1 { @apply text-xl font-semibold text-white mt-5 mb-2 tracking-tight; }
+.md-h2 {
+  @apply text-lg font-semibold text-white mt-5 mb-2 tracking-tight
+         pb-1.5 border-b border-ink-800;
+}
+.md-h3 { @apply text-base font-semibold text-neon-200 mt-4 mb-1.5; }
+
+.md-p  { @apply text-ink-100; }
+
+.md-ul { @apply list-disc pl-5 space-y-1 marker:text-neon-400; }
+.md-ol { @apply list-decimal pl-5 space-y-1 marker:text-neon-400 marker:font-mono; }
+.md-li { @apply text-ink-100; }
+.md-li > p { @apply inline; }
+
+.md-quote {
+  @apply border-l-2 border-neon-400 bg-neon-400/5 pl-4 pr-3 py-2
+         rounded-r text-ink-200 text-sm not-italic;
+}
+
+.md-strong { @apply text-white font-semibold; }
+.md-em     { @apply text-neon-200 not-italic; }
+.md-a      { @apply text-neon-300 underline decoration-neon-400/40 underline-offset-2
+                  hover:decoration-neon-300 transition-colors; }
+.md-hr     { @apply my-5 border-ink-800; }
+
+/* 行内代码 */
+.md-code-inline {
+  @apply font-mono text-[0.85em] px-1.5 py-0.5 mx-0.5 rounded
+         bg-ink-800/80 text-neon-300 border border-ink-700;
+}
+
+/* 代码块容器 */
+.md-codeblock {
+  @apply my-3 rounded-xl border border-ink-800 bg-ink-950/80 overflow-hidden;
+}
+.md-codeblock-head {
+  @apply flex items-center justify-between px-3 py-1.5
+         border-b border-ink-800 bg-ink-900/60;
+}
+.md-pre {
+  @apply p-4 overflow-x-auto text-[12.5px] leading-relaxed font-mono text-ink-100;
+}
+.md-pre code { @apply text-inherit bg-transparent p-0; }
+
+/* 表格 */
+.md-table-wrap {
+  @apply my-3 overflow-x-auto rounded-lg border border-ink-800;
+}
+.md-table { @apply w-full text-sm; }
+.md-thead { @apply bg-ink-900/60 text-ink-200; }
+.md-tr    { @apply border-b border-ink-800 last:border-b-0; }
+.md-th    { @apply text-left px-3 py-2 font-medium border-r border-ink-800 last:border-r-0 whitespace-nowrap; }
+.md-td    { @apply px-3 py-2 border-r border-ink-800 last:border-r-0 text-ink-100; }
+
