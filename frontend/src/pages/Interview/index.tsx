@@ -141,7 +141,7 @@ export default function InterviewPage() {
             <h2 className="text-xl font-semibold text-red-300">加载失败</h2>
             <p className="mt-2 text-sm text-ink-400">{error}</p>
             <p className="mt-2 text-xs text-ink-500">
-              提示：先启动后端（<code className="text-neon-300">cd backend && npm run dev</code>）
+              提示：可刷新页面重试；纯前端 Demo 模式下题库内容来自本地内置数据。
             </p>
           </div>
         ) : (

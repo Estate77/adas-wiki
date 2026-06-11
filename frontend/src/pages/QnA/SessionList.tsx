@@ -144,7 +144,7 @@ export default function SessionList() {
       <div className="px-4 py-3 border-t border-ink-800/80 text-[11px] text-ink-500">
         <p className="leading-relaxed">
           会话数据保存在浏览器本地，<br />
-          登录后将自动同步到云端。
+          当前 Demo 不依赖后端或数据库。
         </p>
       </div>
     </aside>

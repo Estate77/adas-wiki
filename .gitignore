@@ -9,6 +9,7 @@ build/
 .vite/
 .next/
 out/
+*.tsbuildinfo
 
 # ===================== 环境变量（敏感信息） =====================
 .env
@@ -63,3 +64,4 @@ backend/src/generated/
 启动智驾.bat
 
 .vercel
+.env*

@@ -1,4 +1,8 @@
-import { http } from './http';
+import {
+  createDemoId,
+  listKnowledgeRecords,
+  saveKnowledgeRecords,
+} from './demo-db';
 
 export type Dimension =
   | 'TECH_UNDERSTANDING'
@@ -33,33 +37,92 @@ export interface ListParams {
 
 export const knowledgeService = {
   async list(params: ListParams = {}) {
-    const r = await http.get<{ data: { items: KnowledgeListItem[]; total: number; page: number; pageSize: number } }>(
-      '/knowledge',
-      { params },
-    );
-    return r.data.data;
+    const page = Math.max(1, params.page ?? 1);
+    const pageSize = Math.max(1, params.pageSize ?? 20);
+    const keyword = params.keyword?.trim().toLowerCase();
+
+    let items = listKnowledgeRecords();
+    if (params.dimension) {
+      items = items.filter((item) => item.dimension === params.dimension);
+    }
+    if (keyword) {
+      items = items.filter((item) =>
+        [item.title, item.summary ?? '', item.content, item.tags.join(' ')]
+          .join(' ')
+          .toLowerCase()
+          .includes(keyword)
+      );
+    }
+
+    items = [...items].sort((a, b) => {
+      if (b.viewCount !== a.viewCount) return b.viewCount - a.viewCount;
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+
+    const total = items.length;
+    const start = (page - 1) * pageSize;
+    return {
+      items: items.slice(start, start + pageSize),
+      total,
+      page,
+      pageSize,
+    };
   },
   async detail(id: string): Promise<KnowledgeDetail> {
-    const r = await http.get<{ data: KnowledgeDetail }>(`/knowledge/${id}`);
-    return r.data.data;
+    const item = listKnowledgeRecords().find((record) => record.id === id);
+    if (!item) throw new Error('知识点不存在');
+
+    const updated = listKnowledgeRecords().map((record) =>
+      record.id === id ? { ...record, viewCount: record.viewCount + 1 } : record
+    );
+    saveKnowledgeRecords(updated);
+
+    return {
+      ...item,
+      viewCount: item.viewCount + 1,
+      interviewLinks: [],
+    };
   },
   /** 关键字搜索：用于 RAG，未命中时回退 LLM */
   async search(keyword: string, pageSize = 5) {
-    const r = await http.get<{ data: { items: KnowledgeListItem[]; total: number } }>(
-      '/knowledge',
-      { params: { keyword, pageSize } },
-    );
-    return r.data.data;
+    const result = await this.list({ keyword, pageSize, page: 1 });
+    return { items: result.items, total: result.total };
   },
   async create(payload: { title: string; content: string; summary?: string; dimension: Dimension; tags?: string[]; source?: string }) {
-    const r = await http.post<{ data: KnowledgeDetail }>('/knowledge', payload);
-    return r.data.data;
+    const item: KnowledgeDetail = {
+      id: createDemoId('kb'),
+      title: payload.title.trim(),
+      content: payload.content.trim(),
+      summary: payload.summary?.trim() ?? null,
+      dimension: payload.dimension,
+      tags: payload.tags ?? [],
+      source: payload.source ?? 'Demo Custom',
+      viewCount: 0,
+      updatedAt: new Date().toISOString(),
+      interviewLinks: [],
+    };
+    saveKnowledgeRecords([item, ...listKnowledgeRecords()]);
+    return item;
   },
   async update(id: string, payload: Partial<{ title: string; content: string; summary: string; tags: string[]; source: string }>) {
-    const r = await http.patch<{ data: KnowledgeDetail }>(`/knowledge/${id}`, payload);
-    return r.data.data;
+    const items = listKnowledgeRecords();
+    const current = items.find((item) => item.id === id);
+    if (!current) throw new Error('知识点不存在');
+
+    const updatedItem = {
+      ...current,
+      title: payload.title?.trim() ?? current.title,
+      content: payload.content?.trim() ?? current.content,
+      summary: payload.summary === undefined ? current.summary : payload.summary,
+      tags: payload.tags ?? current.tags,
+      source: payload.source === undefined ? current.source : payload.source,
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveKnowledgeRecords(items.map((item) => (item.id === id ? updatedItem : item)));
+    return { ...updatedItem, interviewLinks: [] };
   },
   async remove(id: string) {
-    await http.delete(`/knowledge/${id}`);
+    saveKnowledgeRecords(listKnowledgeRecords().filter((item) => item.id !== id));
   },
 };

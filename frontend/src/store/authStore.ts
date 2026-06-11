@@ -3,6 +3,10 @@ import { authService, type User } from '@/services/auth.service';
 
 const TOKEN_KEY = 'adas_token';
 
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+}
+
 interface AuthState {
   user:      User | null;
   token:     string | null;
@@ -25,6 +29,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   bootstrap: async () => {
     if (get().hydrated) return;
+    if (!isBrowser()) {
+      set({ hydrated: true });
+      return;
+    }
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) {
       set({ hydrated: true });
@@ -45,7 +53,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true });
     try {
       const { token, user } = await authService.login({ email, password });
-      localStorage.setItem(TOKEN_KEY, token);
+      if (isBrowser()) {
+        localStorage.setItem(TOKEN_KEY, token);
+      }
       set({ user, token, loading: false });
     } catch (e) {
       set({ loading: false });
@@ -57,7 +67,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true });
     try {
       const { token, user } = await authService.register({ email, username, password });
-      localStorage.setItem(TOKEN_KEY, token);
+      if (isBrowser()) {
+        localStorage.setItem(TOKEN_KEY, token);
+      }
       set({ user, token, loading: false });
     } catch (e) {
       set({ loading: false });
@@ -66,7 +78,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
-    localStorage.removeItem(TOKEN_KEY);
+    if (isBrowser()) {
+      localStorage.removeItem(TOKEN_KEY);
+    }
     set({ user: null, token: null });
   },
 

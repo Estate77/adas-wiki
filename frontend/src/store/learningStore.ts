@@ -54,9 +54,16 @@ interface PersistedShape {
   prepList: PrepItem[];
 }
 
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+}
+
 function loadFromStorage(): PersistedShape {
+  if (!isBrowser()) {
+    return { favorites: [], prepList: [] };
+  }
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return { favorites: [], prepList: [] };
     return JSON.parse(raw) as PersistedShape;
   } catch {
@@ -65,8 +72,9 @@ function loadFromStorage(): PersistedShape {
 }
 
 function saveToStorage(state: PersistedShape) {
+  if (!isBrowser()) return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
     /* 忽略 */
   }

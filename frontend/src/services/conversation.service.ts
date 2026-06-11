@@ -1,4 +1,13 @@
-import { http } from './http';
+import {
+  createDemoId,
+  getCurrentUserRecord,
+  listConversations,
+  listMessages,
+  saveConversations,
+  saveMessages,
+  type DemoConversationRecord,
+  type DemoMessageRecord,
+} from './demo-db';
 
 export interface Conversation {
   id: string;
@@ -6,26 +15,55 @@ export interface Conversation {
   title: string;
   createdAt: string;
   updatedAt: string;
+  messageCount?: number;
 }
 
 export const conversationService = {
-  async list() {
-    const r = await http.get<{ data: Conversation[] }>('/conversations');
-    return r.data.data;
+  async list(): Promise<Conversation[]> {
+    const current = getCurrentUserRecord();
+    if (!current) return [];
+    const items = listConversations()
+      .filter((item) => item.userId === current.id)
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    const allMessages = listMessages();
+    return items.map((item) => ({
+      ...item,
+      messageCount: allMessages.filter((message) => message.conversationId === item.id).length,
+    }));
   },
   async create(title = '新会话') {
-    const r = await http.post<{ data: Conversation }>('/conversations', { title });
-    return r.data.data;
+    const current = getCurrentUserRecord();
+    if (!current) throw new Error('请先登录');
+    const now = new Date().toISOString();
+    const conv: DemoConversationRecord = {
+      id: createDemoId('conv'),
+      userId: current.id,
+      title: title.slice(0, 60),
+      createdAt: now,
+      updatedAt: now,
+    };
+    saveConversations([conv, ...listConversations()]);
+    return conv;
   },
   async detail(id: string) {
-    const r = await http.get<{ data: Conversation }>(`/conversations/${id}`);
-    return r.data.data;
+    const conv = listConversations().find((item) => item.id === id);
+    if (!conv) throw new Error('会话不存在');
+    return conv;
   },
   async rename(id: string, title: string) {
-    const r = await http.patch<{ data: Conversation }>(`/conversations/${id}`, { title });
-    return r.data.data;
+    const items = listConversations();
+    const conv = items.find((item) => item.id === id);
+    if (!conv) throw new Error('会话不存在');
+    const updated: DemoConversationRecord = {
+      ...conv,
+      title: String(title).slice(0, 60),
+      updatedAt: new Date().toISOString(),
+    };
+    saveConversations(items.map((item) => (item.id === id ? updated : item)));
+    return updated;
   },
   async remove(id: string) {
-    await http.delete(`/conversations/${id}`);
+    saveConversations(listConversations().filter((item) => item.id !== id));
+    saveMessages(listMessages().filter((message) => message.conversationId !== id));
   },
 };

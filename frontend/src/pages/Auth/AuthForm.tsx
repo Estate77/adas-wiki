@@ -72,7 +72,7 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
             {mode === 'login' ? '欢迎回来' : '创建你的账号'}
           </h1>
           <p className="mt-2 text-sm text-ink-400">
-            {mode === 'login' ? '登录后开启 AI 问答 + 学习进度同步' : '加入智驾百科，记录每一份成长'}
+            {mode === 'login' ? '登录后可在当前浏览器保存 AI 问答与学习进度' : '加入智驾百科，体验纯前端 Demo 学习流程'}
           </p>
         </div>
 
@@ -173,6 +173,7 @@ export default function AuthForm({ initialMode = 'login' }: Props) {
             <div className="font-medium text-ink-200 mb-1">💡 演示账号</div>
             <div>邮箱 <code className="text-neon-300">demo@adas.wiki</code> · 密码 <code className="text-neon-300">demo1234</code></div>
             <div>邮箱 <code className="text-neon-300">admin@adas.wiki</code> · 密码 <code className="text-neon-300">admin123</code></div>
+            <div className="mt-1">所有账号数据仅保存在当前浏览器，不依赖后端数据库。</div>
           </div>
         )}
       </div>

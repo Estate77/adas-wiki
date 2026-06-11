@@ -39,9 +39,16 @@ interface PersistedShape {
   currentId: string | null;
 }
 
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+}
+
 function loadFromStorage(): PersistedShape {
+  if (!isBrowser()) {
+    return { conversations: [], messages: {}, currentId: null };
+  }
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return { conversations: [], messages: {}, currentId: null };
     return JSON.parse(raw) as PersistedShape;
   } catch {
@@ -50,8 +57,9 @@ function loadFromStorage(): PersistedShape {
 }
 
 function saveToStorage(state: PersistedShape) {
+  if (!isBrowser()) return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
     /* 忽略 */
   }
@@ -90,7 +98,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         conversationId: id,
         role: 'ASSISTANT',
         content:
-          '你好！我是智驾百科的 AI 助手 🤖\n\n你可以问我任何智能驾驶相关的问题，例如：\n\n- 激光雷达的工作原理是什么？\n- BEV 和 Occupancy Network 有什么关系？\n- 端到端自动驾驶和模块化有什么区别？\n- ISO 26262 和 SOTIF 有什么区别？\n\n当前为 **Mock 模式**，回答由本地知识库生成。接入后端后会自动切换为真实大模型。',
+          '你好！我是智驾百科的 AI 助手 🤖\n\n你可以问我任何智能驾驶相关的问题，例如：\n\n- 激光雷达的工作原理是什么？\n- BEV 和 Occupancy Network 有什么关系？\n- 端到端自动驾驶和模块化有什么区别？\n- ISO 26262 和 SOTIF 有什么区别？\n\n当前为 **纯前端 Demo 模式**，回答与会话都保存在当前浏览器中，无需后端或数据库。',
         createdAt: Date.now(),
       };
       const next: PersistedShape = {
@@ -379,7 +387,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       isStreaming: false,
       abortCtrl: null,
     });
-    localStorage.removeItem(STORAGE_KEY);
+    if (isBrowser()) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   },
 }));
 

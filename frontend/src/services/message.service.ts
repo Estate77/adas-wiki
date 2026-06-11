@@ -1,4 +1,12 @@
-import { http } from './http';
+import {
+  createDemoId,
+  getCurrentUserRecord,
+  listConversations,
+  listMessages,
+  saveConversations,
+  saveMessages,
+  type DemoMessageRecord,
+} from './demo-db';
 
 export type MessageRole = 'USER' | 'ASSISTANT' | 'SYSTEM';
 
@@ -19,29 +27,58 @@ export interface Message {
   citations?: Citation[];
 }
 
+function touchConversation(conversationId: string) {
+  const items = listConversations();
+  const conv = items.find((item) => item.id === conversationId);
+  if (!conv) return;
+  saveConversations(
+    items.map((item) => (item.id === conversationId ? { ...item, updatedAt: new Date().toISOString() } : item))
+  );
+}
+
+function ensureOwnership(conversationId: string) {
+  const current = getCurrentUserRecord();
+  if (!current) throw new Error('请先登录');
+  const conv = listConversations().find((item) => item.id === conversationId);
+  if (!conv) throw new Error('会话不存在');
+  if (conv.userId !== current.id) throw new Error('无权访问该会话');
+}
+
 export const messageService = {
-  /** 列出指定会话的全部消息（按时间升序） */
-  async listByConversation(conversationId: string) {
-    const r = await http.get<{ data: Message[] }>(`/messages/conversation/${conversationId}`);
-    return r.data.data;
+  async listByConversation(conversationId: string): Promise<Message[]> {
+    ensureOwnership(conversationId);
+    return listMessages()
+      .filter((item) => item.conversationId === conversationId)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   },
-  /** 用户发送一条新消息（同步调用；流式请用 qna.streamChat） */
   async send(conversationId: string, content: string) {
-    const r = await http.post<{ data: Message }>('/messages', {
+    ensureOwnership(conversationId);
+    const now = new Date().toISOString();
+    const message: DemoMessageRecord = {
+      id: createDemoId('msg'),
       conversationId,
       role: 'USER',
       content,
-    });
-    return r.data.data;
+      tokensUsed: null,
+      createdAt: now,
+    };
+    saveMessages([...listMessages(), message]);
+    touchConversation(conversationId);
+    return message;
   },
-  /** 助手追加一条消息（仅在流式完成后由前端调用，便于在 DB 落库） */
   async appendAssistant(conversationId: string, content: string, tokensUsed?: number) {
-    const r = await http.post<{ data: Message }>('/messages', {
+    ensureOwnership(conversationId);
+    const now = new Date().toISOString();
+    const message: DemoMessageRecord = {
+      id: createDemoId('msg'),
       conversationId,
       role: 'ASSISTANT',
       content,
-      tokensUsed,
-    });
-    return r.data.data;
+      tokensUsed: tokensUsed ?? null,
+      createdAt: now,
+    };
+    saveMessages([...listMessages(), message]);
+    touchConversation(conversationId);
+    return message;
   },
 };

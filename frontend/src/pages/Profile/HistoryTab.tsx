@@ -42,7 +42,7 @@ export default function HistoryTab() {
         <div className="glass-panel p-4 flex items-center gap-3 border-amber-400/30">
           <span className="text-amber-300 text-lg">⚠️</span>
           <div className="flex-1 text-sm text-ink-300">
-            当前历史仅保存在本地浏览器，<Link to="/login" className="text-neon-300 hover:underline">登录</Link> 后可同步到云端、多端访问
+            当前是纯前端 Demo 模式，对话历史仅保存在本地浏览器；你仍可 <Link to="/login" className="text-neon-300 hover:underline">登录</Link> 以区分个人资料与学习记录
           </div>
         </div>
       )}
