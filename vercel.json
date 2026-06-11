@@ -1,8 +1,7 @@
 {
   "buildCommand": "npm install && cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "npm install && cd api && npm install",
-  "devCommand": "npm run dev",
+  "installCommand": "npm install",
   "regions": ["iad1"],
   "functions": {
     "api/**/*.ts": {
@@ -11,6 +10,9 @@
       "maxDuration": 10
     }
   },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -18,13 +20,6 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, PATCH, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" }
       ]
     }
   ]
