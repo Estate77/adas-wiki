@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  repository-projects: read
 
 concurrency:
   group: pages
@@ -18,6 +19,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Enable GitHub Pages
+        run: |
+          echo "Ensuring GitHub Pages is enabled..."
+          status=$(gh api repos/${{ github.repository }}/pages 2>/dev/null | jq -r '.status // "disabled"')
+          if [ "$status" = "disabled" ] || [ -z "$status" ]; then
+            echo "Enabling Pages..."
+            gh api -X POST repos/${{ github.repository }}/pages -f source[branch]=main -f source[path]=/ 2>&1 || echo "Pages might already be configured"
+          else
+            echo "Pages status: $status"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
       - name: Checkout
         uses: actions/checkout@v4
 
