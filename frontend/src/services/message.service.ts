@@ -49,7 +49,8 @@ export const messageService = {
     ensureOwnership(conversationId);
     return listMessages()
       .filter((item) => item.conversationId === conversationId)
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      .map((item) => ({ ...item, role: item.role as MessageRole }));
   },
   async send(conversationId: string, content: string) {
     ensureOwnership(conversationId);
