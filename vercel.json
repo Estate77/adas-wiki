@@ -5,6 +5,18 @@
   "installCommand": "npm install && cd api && npm install",
   "devCommand": "npm run dev",
   "regions": ["iad1"],
+  "experimentalServices": {
+    "frontend": {
+      "routePrefix": "/",
+      "buildCommand": "cd frontend && npm install && npm run build",
+      "outputDirectory": "frontend/dist"
+    },
+    "api": {
+      "routePrefix": "/api",
+      "buildCommand": "cd api && npm install",
+      "outputDirectory": "api"
+    }
+  },
   "functions": {
     "api/**/*.ts": {
       "runtime": "@vercel/node@3.0.0",
