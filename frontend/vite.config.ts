@@ -14,6 +14,15 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 5173,
     open: true,
+    host: true,
+    allowedHosts: true,
+    strictPort: false,
+  },
+  preview: {
+    host: true,
+    port: 4173,
+    allowedHosts: true,
+    strictPort: false,
   },
   build: {
     target: 'es2022',
