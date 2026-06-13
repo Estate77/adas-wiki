@@ -11,6 +11,7 @@ permissions:
   id-token: write
   actions: write
   repository-projects: read
+  administration: write
 
 concurrency:
   group: pages
