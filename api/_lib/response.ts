@@ -1,10 +1,9 @@
 /**
  * CORS 响应头辅助函数 - 用于 Vercel Serverless
  */
-import type { NextRequest } from 'next';
 
-export function getCorsHeaders(request: NextRequest): Record<string, string> {
-  const origin = request.headers.get('origin') ?? '*';
+export function getCorsHeaders(request?: Request): Record<string, string> {
+  const origin = request?.headers.get('origin') ?? '*';
   return {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
@@ -13,7 +12,7 @@ export function getCorsHeaders(request: NextRequest): Record<string, string> {
   };
 }
 
-export function handleOptions(request: NextRequest): Response {
+export function handleOptions(request: Request): Response {
   return new Response(null, {
     status: 204,
     headers: getCorsHeaders(request),
@@ -25,7 +24,7 @@ export function json<T>(data: T, init?: ResponseInit): Response {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      ...getCorsHeaders(request),
+      ...getCorsHeaders(),
       ...init?.headers,
     },
   });
@@ -35,7 +34,3 @@ export function errorResponse(message: string, code: string, status: number): Re
   return json({ code, message }, { status });
 }
 
-// 伪装的 request 对象用于复用中间件
-export function getRequest(request: Request) {
-  return request as unknown as NextRequest;
-}

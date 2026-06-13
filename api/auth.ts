@@ -1,7 +1,6 @@
-/**
+﻿/**
  * 鉴权 API - Vercel Serverless 版本
  */
-import { NextRequest } from 'next';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from './_lib/prisma';
@@ -17,7 +16,7 @@ export const config = {
   },
 };
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   if (request.method === 'OPTIONS') {
     return handleOptions(request);
   }
@@ -60,7 +59,7 @@ export async function GET(request: NextRequest) {
   return errorResponse('Not Found', 'NOT_FOUND', 404);
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   if (request.method === 'OPTIONS') {
     return handleOptions(request);
   }
@@ -165,3 +164,4 @@ export async function POST(request: NextRequest) {
     return errorResponse('服务器内部错误', 'INTERNAL_ERROR', 500);
   }
 }
+

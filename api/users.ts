@@ -1,13 +1,12 @@
-/**
+﻿/**
  * 用户 API - Vercel Serverless 版本
  */
-import { NextRequest } from 'next';
 import bcrypt from 'bcryptjs';
 import { prisma } from './_lib/prisma';
 import { getUserFromRequest } from './_lib/auth';
 import { json, errorResponse, handleOptions } from './_lib/response';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const user = getUserFromRequest(request);
@@ -47,7 +46,7 @@ export async function GET(request: NextRequest) {
   return errorResponse('未知操作', 'UNKNOWN_ACTION', 400);
 }
 
-export async function PATCH(request: NextRequest) {
+export async function PATCH(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const user = getUserFromRequest(request);
@@ -85,3 +84,4 @@ export async function PATCH(request: NextRequest) {
     return errorResponse('服务器内部错误', 'INTERNAL_ERROR', 500);
   }
 }
+

@@ -1,7 +1,6 @@
-/**
+﻿/**
  * 知识库 API - Vercel Serverless 版本
  */
-import { NextRequest } from 'next';
 import { prisma } from './_lib/prisma';
 import { getUserFromRequest } from './_lib/auth';
 import { json, errorResponse, handleOptions } from './_lib/response';
@@ -18,7 +17,7 @@ function decodeKb<T extends { tags: unknown }>(kb: T) {
   return { ...kb, tags: safeParseTags(kb.tags) } as Omit<T, 'tags'> & { tags: string[] };
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const { searchParams } = new URL(request.url);
@@ -73,7 +72,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const user = getUserFromRequest(request);
@@ -104,3 +103,4 @@ export async function POST(request: NextRequest) {
     return errorResponse('服务器内部错误', 'INTERNAL_ERROR', 500);
   }
 }
+

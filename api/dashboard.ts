@@ -1,12 +1,11 @@
 /**
  * 仪表盘 API - Vercel Serverless 版本
  */
-import { NextRequest } from 'next';
 import { prisma } from './_lib/prisma';
 import { getUserFromRequest } from './_lib/auth';
 import { json, errorResponse, handleOptions } from './_lib/response';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const user = getUserFromRequest(request);
@@ -52,7 +51,10 @@ export async function GET(request: NextRequest) {
           masteredCount: mastered.length,
           mockExamCount: recent.length,
           averageScore: recent.length
-            ? Math.round(recent.reduce((s, r) => s + r.score, 0) / recent.length)
+            ? Math.round(
+                recent.reduce((sum: number, record: { score: number }) => sum + record.score, 0) /
+                  recent.length
+              )
             : 0,
           recentMockExams: recent,
           dimensionMastered,
@@ -68,7 +70,7 @@ export async function GET(request: NextRequest) {
   return errorResponse('未知操作', 'UNKNOWN_ACTION', 400);
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const user = getUserFromRequest(request);
@@ -121,3 +123,4 @@ export async function POST(request: NextRequest) {
     return errorResponse('服务器内部错误', 'INTERNAL_ERROR', 500);
   }
 }
+

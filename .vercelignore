@@ -1,4 +1,7 @@
 backend/
+ADAS/
+.trae/
+docs/
 node_modules/
 .git/
 .vercel/
@@ -6,6 +9,4 @@ node_modules/
 .env
 .env.local
 .env.production
-deploy.ps1
-setup-vercel-env.ps1
 启动智驾.bat

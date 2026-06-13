@@ -1,12 +1,11 @@
-/**
+﻿/**
  * 会话 API - Vercel Serverless 版本
  */
-import { NextRequest } from 'next';
 import { prisma } from './_lib/prisma';
 import { getUserFromRequest, HttpError } from './_lib/auth';
 import { json, errorResponse, handleOptions } from './_lib/response';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const user = getUserFromRequest(request);
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest) {
   return errorResponse('Not Found', 'NOT_FOUND', 404);
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   if (request.method === 'OPTIONS') return handleOptions(request);
 
   const user = getUserFromRequest(request);
@@ -81,3 +80,4 @@ export async function POST(request: NextRequest) {
     return errorResponse('服务器内部错误', 'INTERNAL_ERROR', 500);
   }
 }
+
