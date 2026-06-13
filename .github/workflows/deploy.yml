@@ -6,12 +6,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
   actions: write
-  repository-projects: read
-  administration: write
 
 concurrency:
   group: pages
@@ -46,6 +44,7 @@ jobs:
         with:
           enablement: true
           build_type: legacy
+        continue-on-error: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
